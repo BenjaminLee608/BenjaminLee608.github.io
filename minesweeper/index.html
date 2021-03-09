@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minesweeper</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="script.js" defer></script>
+</head>
+
+<body oncontextmenu ="return false;">
+
+
+
+    <h1>Welcome!</h1>
+    <h2>Minesweeper Game</h2>
+
+    <img id="emoji" src="sad.png"/>
+
+    <div>
+        <ul id="counters">
+            <li style="visibility:hidden" id="timer">00:00:00</li>
+            <!-- <li id="tileCounter"></li>  <li id="bombCounter"></li>-->
+        </ul>
+    </div>
+    <table id="grid"></table>
+
+    <button class="button" id="diffEasy">Easy</button>  <button class="button" id="diffHard">Hard</button>  <button class="button" id="reset">Reset</button>
+</body>
+
+<footer>
+    <p>Made by: Benjamin Lee</p>
+    <a href="https://www.github.com/BenjaminLee608/Minesweeper" style="color: black"><i class="fa fa-github fa-2x" ></i></a>
+</footer>
+</html>
