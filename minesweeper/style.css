@@ -1,3 +1,4 @@
+
 body{
     text-align: center;
     background-color: #DCDCDC;
@@ -10,7 +11,7 @@ footer{
     text-align: center;
     padding: 0px;
     margin-top: 4em;
-    margin-bottom: 1em;
+    margin-bottom: 0em;
 }
 
 h1,h2,p, #counters li{
@@ -27,15 +28,26 @@ p{
 }
 
 h1{
-    font-size: 5em;
+    font-size: min(15vw, 100px);
     padding: 0px;
     text-shadow: 2px 2px #999999;
 }
 h2{
-    font-size: 3em;
+    font-size: min(5vw, 33.33px);
     padding: 0px;
     text-shadow: 2px 2px #999999;
 }
+
+.gameContainer{
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 
 .clicked{
 
@@ -45,16 +57,53 @@ h2{
     background-color: red;
 }
 
+.flexContainer{
+    display: flex;
+    flex-direction: columns;
+    flex-wrap: nowrap;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+
+.leftSection, .emptyBox{
+
+    justify-content: center;
+    height: 100vh;
+    vertical-align: center;
+    width: 25%;
+    top: 10em;
+    margin-top: 10em;
+    font-family: 'DotGothic16', sans-serif;
+
+}
+.leftSection .leaderboard{
+
+}
+
+.game{
+}
+.holdDown{
+    background: #333333;
+    color: #b3b3b3;
+}
+
+
 #counters{
     position: relative;
 }
 
-#counters li{
+#counters p{
+    font-family: 'VT323', monospace;
+    margin-top: .2em;
     border: 2px solid black;
     text-align: center;
+    transform: scale(1.2, 1);
     background-color: #555555;
-    color: red;
+    color: #ABD7E5;
     display:inline-block;
+    font-weight: bold;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 
 
 }
@@ -79,7 +128,7 @@ h2{
 
 
 table{
-    margin-top: 1em;
+    margin-top: 0em;
     margin-left: auto;
     margin-right: auto;
     border: 2px solid #808080;
@@ -87,7 +136,7 @@ table{
 }
 
 button{
-    margin-top: 1em;
+    margin-top: 1.5em;
 }
 
 #grid TR TD{
@@ -99,6 +148,7 @@ button{
     left: 10px;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     text-align: center;
+    min-width: 1.5em;
 }
 img{
 
@@ -118,6 +168,10 @@ img{
     color: #b3b3b3;
 }
 
+#flagCounter{
+    margin-top: .5em;
+}
+
 .button{
     background-color: #708090; /* Green */
     border: 1px solid #2F4F4F;
@@ -126,6 +180,7 @@ img{
     text-align: center;
     text-decoration: none;
     display: inline-block;
+    margin-top: 0em;
     font-size: 15px;
     font-family: 'DotGothic16', sans-serif;
 
@@ -156,4 +211,24 @@ img{
 }
 #grid TR TD[cellData="7"]{
   color: gray;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

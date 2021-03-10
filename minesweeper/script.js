@@ -13,16 +13,20 @@ var width = 8;
 var numMines = 10;
 var numTiles = height*width - numMines;
 var clicked = 0;
-var flagCounter = 0;
+var bombsLeft = numMines;
 var miliseconds = 0;
 var seconds = 0;
 var minutes = 0;
 var hours = 0;
-var timerInterval;
-
+var timerInterval = null;
+var mouseDown = 0;
 
 var lost = false;
 var firstClick = true;
+
+
+
+
 
 const TESTING = 0;
 
@@ -32,6 +36,7 @@ function createGrid(){
         var row = GRID.insertRow(i);
         for(let j = 0; j < width; j++){
             var cell = row.insertCell(j);
+            //cell.setAttribute('draggable', false);
             cell.onclick = function(){
                 clickCell(this);
                 if(TESTING){
@@ -39,6 +44,39 @@ function createGrid(){
                 }
                 updateCounters()
             };
+            cell.onmousedown = function(){
+                mouseDown = 1;
+                emoji.setAttribute("src", "images/shocked.png");
+                this.classList.add("holdDown");
+
+            };
+            cell.onmouseover = function() {
+                if(emoji.getAttribute("src") == "images/smile.png" && !lost && mouseDown){
+                    emoji.setAttribute("src", "images/shocked.png");
+
+                }
+                if(!cell.classList.contains("clicked") && mouseDown){
+                    let x = this.parentNode.rowIndex;
+                    let y = this.cellIndex;
+                    //console.log("x: " + x + "y: " + y);
+                    this.classList.add("holdDown");
+
+                }
+            };
+
+
+            cell.onmouseout = function() {
+                if(emoji.getAttribute("src") == "images/shocked.png" && !lost && !mouseDown){
+                    emoji.setAttribute("src", "images/smile.png");
+                }
+                this.classList.remove("holdDown");
+            };
+            cell.onmouseup = function() {
+                this.classList.remove("holdDown");
+            };
+
+
+
             var data = document.createAttribute("cellData");
             data.value = 0;
             var onContextMenu = document.createAttribute("oncontextmenu");
@@ -146,6 +184,7 @@ function countBombs2(x,y){
 }
 
 function displayTime(){
+    //console.log(miliseconds);
     miliseconds+= 10;
     if(miliseconds > 999){
         seconds++;
@@ -160,22 +199,26 @@ function displayTime(){
         seconds-=60;
     }
 
-    let ms = (miliseconds/10);
+    msFloor = miliseconds/10;
 
     let sec = seconds;
-    if (seconds < 10 || seconds == 0) {
+    if (seconds < 10) {
       sec = '0' + seconds;
     }
     let min = minutes;
-    if (min < 10 || min == 0) {
+    if (min < 10) {
       min = '0' + minutes;
     }
     let hr = "";
     if (hr > 0 && hr < 10) {
         hr = '0' + hours + ':';
     }
+    let ms = msFloor;
+    if (msFloor < 10) {
+        ms = '0' + msFloor;
+    }
 
-    timer.innerHTML = hr + min + ':' + sec + ':' + ms;
+    TIMER.innerHTML = hr + min + ':' + sec + ':' + ms;
 
 }
 
@@ -187,10 +230,11 @@ function clickCell(cell){
     let y = cell.cellIndex;
     var cellData = cell.getAttribute("cellData");
 
+    console.log(miliseconds);
     if(firstClick){
         console.log(TIMER.innerHTML);
         timerInterval = setInterval(displayTime,10);
-        console.log();
+
     }
 //FIRST CLICK (guarenteed 3x3)
     while(firstClick && cellData != 0){
@@ -327,9 +371,9 @@ function clickCell(cell){
 
     if(cellData == -1){
         cell.classList.add("bomb");
-        cell.innerHTML = "<img src=\'bomb.png\' class=\'flag\' alt=\'hello\'/>";
+        emoji.setAttribute("src", "images/dead.png");
+        cell.innerHTML = "<img src=\'images/bomb.png\' class=\'flag\' alt=\'hello\'/>";
         clearTimer();
-        timerInterval = null;
         lost = true;
         showBombs(x,y);
         //console.log("GAMEOVER");
@@ -357,7 +401,7 @@ function showBombs(x,y){
     for(let i = 0; i < height; i++){
         for(let j = 0; j < width; j++){
             if(GRID.rows[i].cells[j].getAttribute("cellData") == -1 && (i != x || j != y)){
-                GRID.rows[i].cells[j].innerHTML = "<img src=\'bomb.png\' alt=\'hello\'/>";
+                GRID.rows[i].cells[j].innerHTML = "<img src=\'images/bomb.png\' alt=\'hello\'/>";
             }
         }
     }
@@ -366,10 +410,9 @@ function showBombs(x,y){
 function clearTimer(){
     if(timerInterval != null){
         clearInterval(timerInterval);
-        timerInterval = null;
     }
     miliseconds = 0;
-    second = 0;
+    seconds = 0;
     minutes = 0;
     hours = 0;
 }
@@ -401,13 +444,11 @@ function clickZeros(x, y){
 }
 
 function checkWinCondition(){
-    if(clicked == numTiles){
+    if(clicked == numTiles){ // WIN! add a score to the Leaderboard
         console.log("Win!");
-        emoji.setAttribute("src", "sunglasses.png");
+        emoji.setAttribute("src", "images/sunglasses.png");
         showBombs();
         clearTimer();
-        timerInterval = null;
-
 
     }
 }
@@ -416,7 +457,7 @@ function initalizeGame(){
     //createArray();
     createGrid();
     addMines(numMines);
-    updateCounters()
+    updateCounters();
 
     if(TESTING){
         showAllValues()
@@ -426,6 +467,7 @@ function initalizeGame(){
 function updateCounters(){
     //TILECOUNTER.innerHTML = clicked;
     //BOMBCOUNTER.innerHTML = numMines - flagCounter;
+    BOMBCOUNTER.innerHTML = "Bomb Counter: " + bombsLeft;
 }
 
 function addFlag(cell){
@@ -435,8 +477,11 @@ function addFlag(cell){
             cell.innerHTML = "";
         }
         else{
-            cell.innerHTML = "<img src=\'flag.png\' alt=\'hello\'/>";
+            cell.innerHTML = "<img src=\'images/flag.png\' alt=\'hello\'/>";
             cell.classList.add("flagged");
+            bombsLeft--;
+            updateCounters();
+
         }
 
 
@@ -445,27 +490,45 @@ function addFlag(cell){
 
 }
 
-function resetGame(){
-    GRID.innerHTML = "";
-    timer = 0;
-    initalizeGame();
-    clearTimer();
-    timerInterval = null;
-    TIMER.innerHTML = "00:00:00";
-    hideAllValues();
+function resetValues(){
+    //timer = 0;
     lost = false;
     clicked = 0;
     firstClick = true;
     numTiles = height*width - numMines;
-    emoji.setAttribute("src", "sad.png");
+    bombsLeft = numMines;
+    emoji.setAttribute("src", "images/smile.png");
+}
+function resetGame(){
+
+    GRID.innerHTML = "";
+
+    initalizeGame();
+    clearTimer();
+    resetValues()
+    hideAllValues();
     updateCounters()
-    if(TESTING){
-        showAllValues()
-    }
 }
 
-RESETBUTTON.addEventListener("click", resetGame, false);
-EASYBUTTON.addEventListener("click", function(){height=8;width=8;numMines=10;resetGame();}, false);
-HARDBUTTON.addEventListener("click", function(){height=16;width=30;numMines=99;numTiles = height*width - numMines;resetGame();}, false);
+RESETBUTTON.addEventListener("click", function(){resetGame();}, false);
+EASYBUTTON.addEventListener("click", function(){height=8;width=8;numMines=10; resetGame();}, false);
+HARDBUTTON.addEventListener("click", function(){height=16;width=30;numMines=99;numTiles = height*width - numMines; resetGame();}, false);
+
+document.body.onmouseup = function(){
+    mouseDown = 1;
+
+};
+
+document.body.onmouseup = function(){
+    mouseDown = 0;
+    if(emoji.getAttribute("src") == "images/shocked.png"){
+        emoji.setAttribute("src", "images/smile.png");
+    }
+
+};
+
 console.log("hi");
+
+
+
 initalizeGame();
