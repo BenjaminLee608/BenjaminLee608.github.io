@@ -36,14 +36,6 @@ function createGrid(){
         var row = GRID.insertRow(i);
         for(let j = 0; j < width; j++){
             var cell = row.insertCell(j);
-            //cell.setAttribute('draggable', false);
-            cell.onclick = function(){
-                clickCell(this);
-                if(TESTING){
-                    showAllValues()
-                }
-                updateCounters()
-            };
             cell.onmousedown = function(){
                 mouseDown = 1;
                 emoji.setAttribute("src", "images/shocked.png");
@@ -73,6 +65,11 @@ function createGrid(){
             };
             cell.onmouseup = function() {
                 this.classList.remove("holdDown");
+                clickCell(this);
+                if(TESTING){
+                    showAllValues()
+                }
+                updateCounters()
             };
 
 
