@@ -2,7 +2,7 @@ Priority List:
 
 X - Timer
     FIXED
-- MAKE MORE EFFICIENT
+X - MAKE MORE EFFICIENT
     Double for loops
     Get rid of all the continue statements
 X - MAKE 3x3 ON FIRST CLICK
@@ -10,3 +10,7 @@ X - MAKE 3x3 ON FIRST CLICK
 X - Flag
 
 X - Smiley Face
+
+X - Double Clicking
+
+- Leaderboard
