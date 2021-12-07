@@ -7,8 +7,14 @@ const BOMBCOUNTER = document.querySelector("#bombCounter");
 const EMOJI = document.querySelector("#emoji");
 const TIMER = document.querySelector("#timer");
 
-var height = 8;
-var width = 8;
+const LEADERBOARD = [document.querySelector("#firstPlace"),document.querySelector("#secondPlace"),
+                        document.querySelector("#thirdPlace"),document.querySelector("#fourthPlace"),document.querySelector("#fifthPlace"),
+                        document.querySelector("#sixthPlace"),document.querySelector("#seventhPlace"),document.querySelector("#eighthPlace"),
+                        document.querySelector("#ninthPlace"),document.querySelector("#tenthPlace")];
+
+
+var height = 9;
+var width = 9;
 var numMines = 10;
 var numTiles = height*width - numMines;
 var clicked = 0;
@@ -23,6 +29,19 @@ var rightMouseDown = 0;
 var bothMouseDown = 0;
 var lost = false;
 var firstClick = true;
+
+var totalSeconds = localStorage['time'] || 0;
+
+var leaderboardTimes = [];
+
+var stored = localStorage['leaderboardTimes'];
+
+if (stored) leaderboardTimes = JSON.parse(stored);
+
+updateLeaderboard();
+
+
+console.log(totalSeconds);
 const TESTING = 0;
 
 // 3x3 function
@@ -77,7 +96,6 @@ function createGrid(){
 
                 }
                 if(!cell.classList.contains("clicked") && mouseDown && !this.classList.contains("flagged") && !lost){
-                    //console.log("x: " + x + "y: " + y);
                     if(bothMouseDown){ // if both mouse are held down, open highlight 3x3 around mouse
                         let x = this.parentNode.rowIndex;
                         let y = this.cellIndex;
@@ -155,12 +173,9 @@ function createGrid(){
             onContextMenu.value="return false";
             cell.setAttributeNode(onContextMenu);
             cell.setAttributeNode(data);
-            //console.log(cell.getAttribute("cellData"));
         }
     }
-    //
 
-    //console.log(GRID);
 }
 
 function addMines(num,clickX,clickY){
@@ -171,7 +186,6 @@ function addMines(num,clickX,clickY){
 
         if(cellData.getAttribute("cellData") != -1 && !(x >= clickX-1 && x <= clickX + 1 && y <= clickY + 1 && y >= clickY-1)){
             cellData.setAttribute("cellData", -1);
-            //console.log("added bomb on: " + x + ", " + y);
             applyGrid(function(j,k){
                 if(GRID.rows[j].cells[k].getAttribute("cellData") >= 0){
                     GRID.rows[j].cells[k].setAttribute("cellData", parseInt(GRID.rows[j].cells[k].getAttribute("cellData"))+1) ;
@@ -198,7 +212,6 @@ function countMines(x,y){
             }
         }
     }
-    console.log(mineCounter);
     return mineCounter;
 }
 
@@ -217,11 +230,9 @@ function hideAllValues(){
             cellData.innerHTML = "";
         }
     }
-    //console.log("reset");
 }
 
 function displayTime(){
-    //console.log(miliseconds);
     miliseconds+= 10;
     if(miliseconds > 999){
         seconds++;
@@ -267,14 +278,10 @@ function clickCell(cell){
     let y = cell.cellIndex;
     var cellData = cell.getAttribute("cellData");
 
-    //console.log(miliseconds);
     //Create grid on first click
     if(firstClick){
-        //console.log(TIMER.innerHTML);
         timerInterval = setInterval(displayTime,10);
-        //console.log("FIRST CLICK ON: " + x + ", " + y);
         addMines(numMines,x,y);
-        //console.log("end of first clickv");
     }
 
 //End of firstClick
@@ -287,7 +294,6 @@ function clickCell(cell){
         clearTimer();
         lost = true;
         showBombs(x,y);
-        //console.log("GAMEOVER");
     }
 
     else if(!cell.classList.contains("clicked")){
@@ -299,11 +305,7 @@ function clickCell(cell){
             cell.classList.add("clicked");
             cell.innerHTML = cell.getAttribute("cellData");
         }
-        //console.log(clicked);
-        //console.log(numTiles);
         checkWinCondition();
-
-        //console.log(cell.getAttribute("cellData"));
     }
 
 }
@@ -354,15 +356,39 @@ function clickZeros(x, y){
 function checkWinCondition(){
     if(clicked == numTiles){ // WIN! add a score to the Leaderboard
         console.log("Win!");
+
+        totalSeconds = seconds*100 + minutes*6000 + miliseconds/10;
+        console.log(totalSeconds);
+        localStorage['time'] = totalSeconds;
+        addToLeaderBoard(totalSeconds);
+        updateLeaderboard();
+
         emoji.setAttribute("src", "images/sunglasses.png");
         showBombs();
         clearTimer();
 
     }
 }
+function addToLeaderBoard(totalSeconds){
+    leaderboardTimes.push(totalSeconds);
+    leaderboardTimes.sort();
+
+    while(leaderboardTimes.length > 10){
+        leaderboardTimes.pop();
+    }
+    localStorage['leaderboardTimes'] = JSON.stringify(leaderboardTimes);
+}
+
+function updateLeaderboard(){
+    for(let i = 0; i < leaderboardTimes.length; i++){
+
+        var tempMilis = leaderboardTimes[i]/100;
+        LEADERBOARD[i].innerHTML = tempMilis;
+    }
+}
 
 function initalizeGame(){
-    //createArray();
+
     createGrid();
 
     updateCounters();
@@ -373,8 +399,6 @@ function initalizeGame(){
 }
 
 function updateCounters(){
-    //TILECOUNTER.innerHTML = clicked;
-    //BOMBCOUNTER.innerHTML = numMines - flagCounter;
     BOMBCOUNTER.innerHTML = "Bomb Counter: " + bombsLeft;
 }
 
@@ -419,13 +443,11 @@ function resetGame(){
 }
 
 RESETBUTTON.addEventListener("click", function(){resetGame();}, false);
-EASYBUTTON.addEventListener("click", function(){height=8;width=8;numMines=10; resetGame();}, false);
+EASYBUTTON.addEventListener("click", function(){height=9;width=9;numMines=10; resetGame();}, false);
 HARDBUTTON.addEventListener("click", function(){height=16;width=30;numMines=99;numTiles = height*width - numMines; resetGame();}, false);
 
 
-
 document.body.onmousedown = function(e){
-    //console.log(bothMouseDown);
     if(!lost && !bothMouseDown){
         if (e.button === 0) {
             mouseDown = 1;
@@ -444,7 +466,6 @@ document.body.onmousedown = function(e){
 
 
 document.body.onmouseup = function(e){
-    //console.log(bothMouseDown);
     if(bothMouseDown){
         bothMouseDown = 0;
         mouseDown = 0;
@@ -460,12 +481,6 @@ document.body.onmouseup = function(e){
         rightMouseDown = 0;
     }
 };
-
-
-
-
-console.log("hi");
-
 
 
 initalizeGame();
